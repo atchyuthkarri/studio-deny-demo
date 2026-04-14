@@ -1,9 +1,12 @@
-import { motion, useScroll, useTransform, useSpring } from "motion/react";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "motion/react";
 import { Instagram, Facebook, Twitter, ArrowRight, ArrowLeft, ChevronDown, Star } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import Preloader from "./components/Preloader/Preloader";
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [scrollY, setScrollY] = useState(0);
+
   const [activeShowcase, setActiveShowcase] = useState("NEW DROP");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
@@ -348,8 +351,25 @@ export default function App() {
   const routeCtaLabel = activePageData?.ctaLabel ?? "View Shop";
   const routeCtaPath = activePageData?.ctaPath ?? "/shop";
 
+  useEffect(() => {
+    if (isLoading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [isLoading]);
+
   return (
-    <div className="bg-[var(--deep-black)] text-[var(--pure-white)] overflow-x-hidden">
+    <>
+      <Preloader onLoadingComplete={() => setIsLoading(false)} />
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoading ? 0 : 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="bg-[var(--deep-black)] text-[var(--pure-white)] overflow-x-hidden"
+      >
+
+
       {/* Navigation */}
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
@@ -1332,6 +1352,9 @@ export default function App() {
           </footer>
         </main>
       )}
-    </div>
+      </motion.div>
+    </>
   );
 }
+
+
